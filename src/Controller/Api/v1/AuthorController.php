@@ -24,7 +24,6 @@ class AuthorController extends AbstractFOSRestController
     {
         $authorRepository = $this->entityManager->getRepository(Author::class);
 
-        // Вызов метода getAuthors()
         $authors = $authorRepository->getAuthors();
 
         return $this->handleView($this->view(json_encode($authors), Response::HTTP_OK));

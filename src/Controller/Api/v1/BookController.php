@@ -20,11 +20,10 @@ class BookController extends AbstractFOSRestController
     /**
      * @Rest\Get("/api/v1/book")
      */
-    public function getTestAuthor(): Response
+    public function getBookTest(): Response
     {
         $bookRepository = $this->entityManager->getRepository(Book::class);
 
-        // Вызов метода getAuthors()
         $book = $bookRepository->getBooks();
 
         return $this->handleView($this->view($book, Response::HTTP_OK));

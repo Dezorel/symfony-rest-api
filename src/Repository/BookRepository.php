@@ -10,8 +10,9 @@ class BookRepository extends EntityRepository
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
 
-        $queryBuilder->select('b')
+        $queryBuilder->select('b.id', 'b.title', 'a.name as author', 'b.description', 'b.price')
             ->from($this->getClassName(), 'b')
+            ->leftJoin('b.author', 'a')
             ->setFirstResult(0)
             ->setMaxResults(1000);
 
