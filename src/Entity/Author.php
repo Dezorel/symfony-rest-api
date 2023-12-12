@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\AuthorRepository")
- * @ORM\Table(name="Author")
+ * @ORM\Table(name="Authors")
  * @ORM\HasLifecycleCallbacks()
  */
 class Author implements JsonSerializable {
