@@ -30,7 +30,7 @@ class Book implements JsonSerializable
      * @ORM\ManyToOne(targetEntity="Author")
      * @ORM\JoinColumn(name="author_id", referencedColumnName="id")
      */
-    private string $author;
+    private ?Author $author;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -77,17 +77,17 @@ class Book implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return Author|null
      */
-    public function getAuthor(): string
+    public function getAuthor(): ?Author
     {
         return $this->author;
     }
 
     /**
-     * @param string $author
+     * @param Author|null $author
      */
-    public function setAuthor(string $author): void
+    public function setAuthor(?Author $author): void
     {
         $this->author = $author;
     }
