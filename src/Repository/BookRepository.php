@@ -26,7 +26,8 @@ class BookRepository extends EntityRepository
         $queryBuilder->select('b.id', 'b.title', 'a.name as author', 'b.description', 'b.price')
             ->from($this->getClassName(), 'b')
             ->leftJoin('b.author', 'a')
-            ->where('b.id = ' . $id);
+            ->where('b.id = :id')
+            ->setParameter('id', $id);
 
         return $queryBuilder->getQuery()->getResult();
     }

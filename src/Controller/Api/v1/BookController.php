@@ -2,12 +2,14 @@
 
 namespace App\Controller\Api\v1;
 
+use App\Entity\Author;
 use App\Entity\Book;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class BookController extends AbstractFOSRestController
 {
@@ -44,6 +46,49 @@ class BookController extends AbstractFOSRestController
         $book = $bookRepository->getBookById($id);
 
         return $this->handleView($this->view($book, Response::HTTP_OK));
+    }
+
+    /**
+     * @Rest\Post("/api/books")
+     */
+    public function createBook(Request $request): Response
+    {
+        $authorRepository = $this->entityManager->getRepository(Author::class);
+
+        $jsonData = json_decode($request->getContent(), true);
+
+        if (isset($jsonData['title']) && isset($jsonData['price']))
+        {
+            $book = new Book();
+
+            $book->setTitle($jsonData['title']);
+
+            $book->setPrice($jsonData['price']);
+
+            if (!$author = $authorRepository->getAuthorByName($jsonData['author_name']))
+            {
+                $author = new Author();
+
+                $author->setName($jsonData['author_name']);
+
+                $this->entityManager->persist($author);
+
+                $this->entityManager->flush();
+            }
+
+            $book->setAuthor($author);
+
+            if (isset($jsonData['description']))
+            {
+                $book->setDescription($jsonData['description']);
+            }
+
+            $this->entityManager->persist($book);
+
+            $this->entityManager->flush();
+        }
+
+        return $this->handleView($this->view($jsonData, Response::HTTP_CREATED));
     }
 
     /**
