@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 class BookController extends AbstractFOSRestController
 {
@@ -25,6 +28,19 @@ class BookController extends AbstractFOSRestController
 
     /**
      * @Rest\Get("/api/books")
+     *
+     * @OA\Get(
+     *     path="/api/books",
+     *     summary="Get a books",
+     *     tags={"Books"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             ref=@Model(type=YourResourceType::class)
+     *         )
+     *     )
+     * )
      */
     public function getBooks(Request $request): Response
     {
