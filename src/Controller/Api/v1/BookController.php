@@ -134,9 +134,10 @@ class BookController extends AbstractFOSRestController
     /**
      * @Rest\Put("/api/books/{id}")
      */
-    public function updateBook(Request $request, int $id): Response
+    public function updateBook(Request $request, ValidatorInterface $validator, int $id): Response
     {
         $availableToCreateAuthor = true;
+        $isBookUpdated = false;
 
         $bookRepository = $this->entityManager->getRepository(Book::class);
         $authorRepository = $this->entityManager->getRepository(Author::class);
@@ -151,45 +152,95 @@ class BookController extends AbstractFOSRestController
             );
         }
 
-        if (isset($jsonData['title']))
+        try
         {
-            $book->setTitle($jsonData['title']);
-        }
-
-        if (isset($jsonData['author_name']))
-        {
-            if (!$author = $authorRepository->getAuthorByName($jsonData['author_name']))
+            if (isset($jsonData['title']))
             {
-                if ($availableToCreateAuthor)
-                {
-                    $author = new Author();
+                UtilityController::validateParam(
+                    $validator,
+                    ['title' => $jsonData['title']],
+                    new Assert\Collection($this->getTitleConstraint())
+                );
 
-                    $author->setName($jsonData['author_name']);
+                $book->setTitle($jsonData['title']);
 
-                    $this->entityManager->persist($author);
-
-                    $this->entityManager->flush();
-                }
-                else
-                {
-                    return $this->handleView(
-                        $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
-                            Response::HTTP_NOT_FOUND)
-                    );
-                }
+                $isBookUpdated = true;
             }
 
-            $book->setAuthor($author);
+            if (isset($jsonData['description']))
+            {
+                UtilityController::validateParam(
+                    $validator,
+                    ['description' => $jsonData['description']],
+                    new Assert\Collection($this->getDescriptionConstraint())
+                );
+
+                $book->setDescription($jsonData['description']);
+
+                $isBookUpdated = true;
+            }
+
+            if (isset($jsonData['price']))
+            {
+                UtilityController::validateParam(
+                    $validator,
+                    ['price' => $jsonData['price']],
+                    new Assert\Collection($this->getPriceConstraint())
+                );
+
+                $book->setPrice($jsonData['price']);
+
+                $isBookUpdated = true;
+            }
+
+            if (isset($jsonData['author_name']))
+            {
+                UtilityController::validateParam(
+                    $validator,
+                    ['author_name' => $jsonData['author_name']],
+                    new Assert\Collection($this->getAuthorConstraint())
+                );
+
+                if (!$author = $authorRepository->getAuthorByName($jsonData['author_name']))
+                {
+                    if ($availableToCreateAuthor)
+                    {
+                        $author = new Author();
+
+                        $author->setName($jsonData['author_name']);
+
+                        $this->entityManager->persist($author);
+
+                        $this->entityManager->flush();
+                    }
+                    else
+                    {
+                        return $this->handleView(
+                            $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                                Response::HTTP_NOT_FOUND)
+                        );
+                    }
+                }
+
+                $book->setAuthor($author);
+
+                $isBookUpdated = true;
+            }
+        }
+        catch (\Exception $e)
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::VALIDATION_FAIL, $e->getMessage()),
+                    Response::HTTP_NOT_ACCEPTABLE)
+            );
         }
 
-        if (isset($jsonData['description']))
+        if (!$isBookUpdated)
         {
-            $book->setDescription($jsonData['description']);
-        }
-
-        if (isset($jsonData['price']))
-        {
-            $book->setPrice($jsonData['price']);
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::MISSING_PARAMS),
+                    Response::HTTP_NOT_ACCEPTABLE)
+            );
         }
 
         $this->entityManager->persist($book);
