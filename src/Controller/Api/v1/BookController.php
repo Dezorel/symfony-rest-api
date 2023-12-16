@@ -330,6 +330,10 @@ class BookController extends AbstractFOSRestController
                     'type' => 'float',
                     'message' => 'The price parameter must be an float.',
                 ]),
+                new Assert\GreaterThanOrEqual([
+                    'value' => 0,
+                    'message' => 'The price must be 0 or more.',
+                ]),
             ],
         ];
     }
