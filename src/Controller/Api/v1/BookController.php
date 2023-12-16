@@ -81,36 +81,49 @@ class BookController extends AbstractFOSRestController
             );
         }
 
-        if (isset($jsonData['title']) && isset($jsonData['price']))
+        $book = new Book();
+
+        if (isset($jsonData['description']))
         {
-            $book = new Book();
-
-            $book->setTitle($jsonData['title']);
-
-            $book->setPrice($jsonData['price']);
-
-            if (!$author = $authorRepository->getAuthorByName($jsonData['author_name']))
+            try
             {
-                $author = new Author();
+                UtilityController::validateParam(
+                    $validator,
+                    ['description' => $jsonData['description']],
+                    new Assert\Collection($this->getDescriptionConstraint())
+                );
 
-                $author->setName($jsonData['author_name']);
-
-                $this->entityManager->persist($author);
-
-                $this->entityManager->flush();
-            }
-
-            $book->setAuthor($author);
-
-            if (isset($jsonData['description']))
-            {
                 $book->setDescription($jsonData['description']);
             }
+            catch (\Exception $e)
+            {
+                return $this->handleView(
+                    $this->view(ReponseController::generateFailedResponse(ResponseCode::VALIDATION_FAIL, $e->getMessage()),
+                        Response::HTTP_NOT_ACCEPTABLE)
+                );
+            }
+        }
 
-            $this->entityManager->persist($book);
+        $book->setTitle($jsonData['title']);
+
+        $book->setPrice($jsonData['price']);
+
+        if (!$author = $authorRepository->getAuthorByName($jsonData['author_name']))
+        {
+            $author = new Author();
+
+            $author->setName($jsonData['author_name']);
+
+            $this->entityManager->persist($author);
 
             $this->entityManager->flush();
         }
+
+        $book->setAuthor($author);
+
+        $this->entityManager->persist($book);
+
+        $this->entityManager->flush();
 
         return $this->handleView(
             $this->view(ReponseController::generateSuccessResponse(ResponseCode::CREATED),
@@ -218,6 +231,9 @@ class BookController extends AbstractFOSRestController
         );
     }
 
+    /**
+     * @return Assert\Collection
+     */
     private function getBookConstraint(): Assert\Collection
     {
         return new Assert\Collection([
@@ -226,11 +242,14 @@ class BookController extends AbstractFOSRestController
               $this->getPriceConstraint(),
               $this->getAuthorConstraint(),
             ),
-            'allowExtraFields' => false,
+            'allowExtraFields' => true,
             'missingFieldsMessage' => 'The field {{ field }} is missing.',
         ]);
     }
 
+    /**
+     * @return Assert\Type[][]
+     */
     private function getTitleConstraint(): array
     {
         return [
@@ -246,6 +265,9 @@ class BookController extends AbstractFOSRestController
         ];
     }
 
+    /**
+     * @return Assert\Type[][]
+     */
     private function getPriceConstraint(): array
     {
         return [
@@ -261,6 +283,9 @@ class BookController extends AbstractFOSRestController
         ];
     }
 
+    /**
+     * @return Assert\Type[][]
+     */
     private function getAuthorConstraint(): array
     {
         return [
@@ -271,6 +296,21 @@ class BookController extends AbstractFOSRestController
                 new Assert\Type([
                     'type' => 'string',
                     'message' => 'The author_name parameter must be an string.',
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * @return Assert\Type[][]
+     */
+    private function getDescriptionConstraint(): array
+    {
+        return [
+            'description' => [
+                new Assert\Type([
+                    'type' => 'string',
+                    'message' => 'The description parameter must be an string.',
                 ]),
             ],
         ];

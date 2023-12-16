@@ -15,7 +15,7 @@ class UtilityController
     public static function validateParam(ValidatorInterface $validator, array $params, Assert\Collection $constraint): bool
     {
         $errors = $validator->validate($params, $constraint);
-        
+
         if (isset($errors[0]))
         {
             throw new Exception($errors[0]->getMessage());
