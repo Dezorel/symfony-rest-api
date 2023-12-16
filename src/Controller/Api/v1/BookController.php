@@ -106,7 +106,7 @@ class BookController extends AbstractFOSRestController
     /**
      * @Rest\Put("/api/books/{id}")
      */
-    public function updateBook(Request $request, int $id)
+    public function updateBook(Request $request, int $id): Response
     {
         $availableToCreateAuthor = true;
 
@@ -178,6 +178,27 @@ class BookController extends AbstractFOSRestController
 
         return $this->handleView(
             $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::SUCCESS, $responseData),
+                Response::HTTP_OK)
+        );
+    }
+
+    /**
+     * @Rest\Delete("/api/books/{id}")
+     */
+    public function deleteBook(int $id): Response
+    {
+        $bookRepository = $this->entityManager->getRepository(Book::class);
+
+        if (!$bookRepository->deleteBookById($id))
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                    Response::HTTP_NOT_FOUND)
+            );
+        }
+
+        return $this->handleView(
+            $this->view(ReponseController::generateSuccessResponse(ResponseCode::SUCCESS),
                 Response::HTTP_OK)
         );
     }

@@ -8,7 +8,12 @@ use Doctrine\ORM\NonUniqueResultException;
 
 class BookRepository extends EntityRepository
 {
-    public function getBooks(int $page = 0, int $elementsPerPage = 10)
+    /**
+     * @param int $page
+     * @param int $elementsPerPage
+     * @return float|int|mixed|string
+     */
+    public function getBooks(int $page = 0, int $elementsPerPage = 10): mixed
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
 
@@ -38,5 +43,20 @@ class BookRepository extends EntityRepository
             ->setParameter('id', $id);
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * @param int $id
+     * @return float|int|mixed|string
+     */
+    public function deleteBookById(int $id): mixed
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+
+        $queryBuilder->delete($this->getClassName(),'b')
+            ->where('b.id = :id')
+            ->setParameter('id', $id);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 }
