@@ -6,11 +6,11 @@ use App\Enums\ResponseCode;
 
 class ReponseController
 {
-    public static function generateFailedResponse(ResponseCode $errorCode): array
+    public static function generateFailedResponse(ResponseCode $errorCode, string $errorMessage = null): array
     {
         return [
             'error_code' => $errorCode->value,
-            'error_message' => $errorCode->getMessage()
+            'error_message' => $errorMessage ?? $errorCode->getMessage()
         ];
     }
 
