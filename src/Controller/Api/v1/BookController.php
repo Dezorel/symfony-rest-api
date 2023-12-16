@@ -35,7 +35,13 @@ class BookController extends AbstractFOSRestController
 
         $page = $page ? $page - 1 : 0;
 
-        $books = $bookRepository->getBooks($page);
+        if (!$books = $bookRepository->getBooks($page))
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                    Response::HTTP_NOT_FOUND)
+            );
+        }
 
         return $this->handleView($this->view($books, Response::HTTP_OK));
     }
