@@ -123,27 +123,6 @@ class BookController extends AbstractFOSRestController
             );
         }
 
-        if (!$author = $authorRepository->getAuthorByName($jsonData['author_name']))
-        {
-            if ($availableToCreateAuthor)
-            {
-                $author = new Author();
-
-                $author->setName($jsonData['author_name']);
-
-                $this->entityManager->persist($author);
-
-                $this->entityManager->flush();
-            }
-            else
-            {
-                return $this->handleView(
-                    $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
-                        Response::HTTP_NOT_FOUND)
-                );
-            }
-        }
-
         if (isset($jsonData['title']))
         {
             $book->setTitle($jsonData['title']);
@@ -151,6 +130,27 @@ class BookController extends AbstractFOSRestController
 
         if (isset($jsonData['author_name']))
         {
+            if (!$author = $authorRepository->getAuthorByName($jsonData['author_name']))
+            {
+                if ($availableToCreateAuthor)
+                {
+                    $author = new Author();
+
+                    $author->setName($jsonData['author_name']);
+
+                    $this->entityManager->persist($author);
+
+                    $this->entityManager->flush();
+                }
+                else
+                {
+                    return $this->handleView(
+                        $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                            Response::HTTP_NOT_FOUND)
+                    );
+                }
+            }
+
             $book->setAuthor($author);
         }
 
@@ -168,8 +168,16 @@ class BookController extends AbstractFOSRestController
 
         $this->entityManager->flush();
 
+        $responseData = [
+            'id' => $book->getId(),
+            'title' => $book->getTitle(),
+            'author' => $book->getAuthor()->getName(),
+            'description' => $book->getDescription(),
+            'price' => $book->getPrice(),
+        ];
+
         return $this->handleView(
-            $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::SUCCESS, $book),
+            $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::SUCCESS, $responseData),
                 Response::HTTP_CREATED)
         );
     }
