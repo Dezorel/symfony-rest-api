@@ -1,0 +1,19 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: 'plaintext'
+    providers:
+        users_in_memory:
+            memory:
+                users:
+                    admin:
+                        password: 'admin'
+                        roles: 'ROLE_ADMIN'
+
+    firewalls:
+        main:
+            http_basic: ~
+            provider: users_in_memory
+
+    access_control:
+        - { path: '^/api/books$', methods: [POST], roles: ROLE_ADMIN }
+        - { path: '^/api/books/\d+$', methods: [PUT, DELETE], roles: ROLE_ADMIN }
