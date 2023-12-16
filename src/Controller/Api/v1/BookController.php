@@ -178,7 +178,7 @@ class BookController extends AbstractFOSRestController
 
         return $this->handleView(
             $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::SUCCESS, $responseData),
-                Response::HTTP_CREATED)
+                Response::HTTP_OK)
         );
     }
 }
