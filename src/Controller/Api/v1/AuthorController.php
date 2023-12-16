@@ -20,12 +20,12 @@ class AuthorController extends AbstractFOSRestController
     /**
      * @Rest\Get("/api/v1/test")
      */
-    public function getTestAuthor(): Response
+    public function test(): Response
     {
         $authorRepository = $this->entityManager->getRepository(Author::class);
 
         $authors = $authorRepository->getAuthors();
 
-        return $this->handleView($this->view(json_encode($authors), Response::HTTP_OK));
+        return $this->handleView($this->view($authors, Response::HTTP_OK));
     }
 }
