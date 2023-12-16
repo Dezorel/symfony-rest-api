@@ -4,6 +4,7 @@ namespace App\Controller\Api\v1;
 
 use App\Entity\Author;
 use App\Entity\Book;
+use App\Enums\ResponseCode;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -45,7 +46,15 @@ class BookController extends AbstractFOSRestController
 
         $book = $bookRepository->getBookById($id);
 
-        return $this->handleView($this->view($book, Response::HTTP_OK));
+        $responseData = [
+            'id' => $book->getId(),
+            'title' => $book->getTitle(),
+            'author' => $book->getAuthor()->getName(),
+            'description' => $book->getDescription(),
+            'price' => $book->getPrice(),
+        ];
+
+        return $this->handleView($this->view($responseData, Response::HTTP_OK));
     }
 
     /**
@@ -88,18 +97,80 @@ class BookController extends AbstractFOSRestController
             $this->entityManager->flush();
         }
 
-        return $this->handleView($this->view($jsonData, Response::HTTP_CREATED));
+        return $this->handleView(
+            $this->view(ReponseController::generateSuccessResponse(ResponseCode::CREATED),
+            Response::HTTP_CREATED)
+        );
     }
 
     /**
-     * @Rest\Get("/api/v1/test")
+     * @Rest\Put("/api/books/{id}")
      */
-    public function testApi(): Response
+    public function updateBook(Request $request, int $id)
     {
+        $availableToCreateAuthor = true;
+
         $bookRepository = $this->entityManager->getRepository(Book::class);
+        $authorRepository = $this->entityManager->getRepository(Author::class);
 
-        $book = $bookRepository->getBooks();
+        $jsonData = json_decode($request->getContent(), true);
 
-        return $this->handleView($this->view($book, Response::HTTP_OK));
+        if (!$book = $bookRepository->getBookById($id))
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                Response::HTTP_NOT_FOUND)
+            );
+        }
+
+        if (!$author = $authorRepository->getAuthorByName($jsonData['author_name']))
+        {
+            if ($availableToCreateAuthor)
+            {
+                $author = new Author();
+
+                $author->setName($jsonData['author_name']);
+
+                $this->entityManager->persist($author);
+
+                $this->entityManager->flush();
+            }
+            else
+            {
+                return $this->handleView(
+                    $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                        Response::HTTP_NOT_FOUND)
+                );
+            }
+        }
+
+        if (isset($jsonData['title']))
+        {
+            $book->setTitle($jsonData['title']);
+        }
+
+        if (isset($jsonData['author_name']))
+        {
+            $book->setAuthor($author);
+        }
+
+        if (isset($jsonData['description']))
+        {
+            $book->setDescription($jsonData['description']);
+        }
+
+        if (isset($jsonData['price']))
+        {
+            $book->setPrice($jsonData['price']);
+        }
+
+        $this->entityManager->persist($book);
+
+        $this->entityManager->flush();
+
+        return $this->handleView(
+            $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::SUCCESS, $book),
+                Response::HTTP_CREATED)
+        );
     }
 }
