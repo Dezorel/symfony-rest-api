@@ -2,7 +2,6 @@
 namespace App\Repository;
 
 use App\Entity\Author;
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 
