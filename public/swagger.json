@@ -1,20 +1,11 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Your API Documentation",
-        "description": "API documentation for your project",
+        "title": "My API",
+        "description": "This is an awesome API",
         "version": "1.0.0"
     },
     "paths": {
-        "\/api\/doc\/api\/doc.json": {
-            "get": {
-                "responses": {
-                    "default": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "\/api\/doc": {
             "get": {
                 "responses": {

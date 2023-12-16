@@ -16,7 +16,7 @@ class SwaggerController extends AbstractController
         // Assuming 'config/dump/swagger.json' is the path to your Swagger JSON
         $jsonUrl = $this->getParameter('kernel.project_dir').'/public/swagger.json';
 
-        return $this->render('index.html.twig', [
+        return $this->render('swagger-ui/index.html.twig', [
             'swagger_data' => [
                 'spec' => json_decode(file_get_contents($jsonUrl), true),
             ],
