@@ -5,12 +5,15 @@ namespace App\Controller\Api\v1;
 use App\Entity\Author;
 use App\Entity\Book;
 use App\Enums\ResponseCode;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\DateTime;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class BookController extends AbstractFOSRestController
 {
@@ -60,11 +63,23 @@ class BookController extends AbstractFOSRestController
     /**
      * @Rest\Post("/api/books")
      */
-    public function createBook(Request $request): Response
+    public function createBook(Request $request, ValidatorInterface $validator): Response
     {
         $authorRepository = $this->entityManager->getRepository(Author::class);
 
         $jsonData = json_decode($request->getContent(), true);
+
+        try
+        {
+            UtilityController::validateParam($validator, $jsonData, $this->getBookConstraint());
+        }
+        catch (Exception $e)
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::VALIDATION_FAIL, $e->getMessage()),
+                    Response::HTTP_NOT_ACCEPTABLE)
+            );
+        }
 
         if (isset($jsonData['title']) && isset($jsonData['price']))
         {
@@ -201,5 +216,63 @@ class BookController extends AbstractFOSRestController
             $this->view(ReponseController::generateSuccessResponse(ResponseCode::SUCCESS),
                 Response::HTTP_OK)
         );
+    }
+
+    private function getBookConstraint(): Assert\Collection
+    {
+        return new Assert\Collection([
+            'fields' => array_merge(
+              $this->getTitleConstraint(),
+              $this->getPriceConstraint(),
+              $this->getAuthorConstraint(),
+            ),
+            'allowExtraFields' => false,
+            'missingFieldsMessage' => 'The field {{ field }} is missing.',
+        ]);
+    }
+
+    private function getTitleConstraint(): array
+    {
+        return [
+            'title' => [
+                new Assert\NotNull([
+                    'message' => 'The title parameter cannot be null.',
+                ]),
+                new Assert\Type([
+                    'type' => 'string',
+                    'message' => 'The title parameter must be an string.',
+                ]),
+            ],
+        ];
+    }
+
+    private function getPriceConstraint(): array
+    {
+        return [
+            'price' => [
+                new Assert\NotNull([
+                    'message' => 'The price parameter cannot be null.',
+                ]),
+                new Assert\Type([
+                    'type' => 'float',
+                    'message' => 'The price parameter must be an float.',
+                ]),
+            ],
+        ];
+    }
+
+    private function getAuthorConstraint(): array
+    {
+        return [
+            'author_name' => [
+                new Assert\NotNull([
+                    'message' => 'The author_name parameter cannot be null.',
+                ]),
+                new Assert\Type([
+                    'type' => 'string',
+                    'message' => 'The author_name parameter must be an string.',
+                ]),
+            ],
+        ];
     }
 }
