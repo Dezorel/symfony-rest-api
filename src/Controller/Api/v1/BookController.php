@@ -47,7 +47,13 @@ class BookController extends AbstractFOSRestController
     {
         $bookRepository = $this->entityManager->getRepository(Book::class);
 
-        $book = $bookRepository->getBookById($id);
+        if (!$book = $bookRepository->getBookById($id))
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                    Response::HTTP_NOT_FOUND)
+            );
+        }
 
         $responseData = [
             'id' => $book->getId(),
