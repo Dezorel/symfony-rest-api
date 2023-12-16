@@ -1,6 +1,9 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: 'Your API Documentation'
-            description: 'API documentation for your project'
-            version: '1.0.0'
+            title: My API
+            description: This is an awesome API
+            version: 1.0.0
+    areas: # To filter the routes that are documented
+        default:
+            path_patterns: [ ^/api ]

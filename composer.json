@@ -20,8 +20,11 @@
         "symfony/framework-bundle": "6.0.*",
         "symfony/runtime": "6.0.*",
         "symfony/security-bundle": "6.0.*",
+        "symfony/twig-bundle": "6.0.*",
         "symfony/validator": "6.0.*",
-        "symfony/yaml": "6.0.*"
+        "symfony/yaml": "6.0.*",
+        "twig/twig": "*",
+        "zircote/swagger-php": "^4.8"
     },
     "config": {
         "allow-plugins": {
