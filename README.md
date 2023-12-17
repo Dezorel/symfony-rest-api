@@ -17,8 +17,12 @@ List any prerequisites needed to install and run your project, such as:
 3. **Configure Environment Variables**
 - Modify the `.env` file to set up your database
 `DATABASE_URL="mysql://custom_user:X0h6ckk4J@J5pcO&1MAC@127.0.0.1:3306/API_DB"`
+- Set up your database by mysql dump
+`./config/dump/API_DB.sql`
 4. **Create directory for book catalog**
 `./public/catalog/`
+5. **Configure Nginx and PHP_FPM for your project**
+- Set up your project to run with ngixn and php-fpm 
 
-## Update documentation
+## Update Swagger documentation
 `php bin/console nelmio:apidoc:dump > public/swagger.json`
