@@ -19,7 +19,7 @@ return function (RoutingConfigurator $routes) {
         ->controller([BookController::class, 'createBook']);
 
     $routes->add('get_books_catalog', '/api/books/catalog')
-        ->methods(['GET'])
+        ->methods(['POST'])
         ->controller([BookController::class, 'generateBookCatalog']);
 
     $routes->add('get_book_by_id', '/api/books/{id}')
