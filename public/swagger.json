@@ -15,28 +15,77 @@
                 }
             }
         },
-        "\/api\/v1\/test": {
-            "get": {
-                "responses": {
-                    "default": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "\/api\/books": {
             "get": {
                 "tags": [
                     "Books"
                 ],
-                "summary": "Get a books",
+                "summary": "Get a list of books",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "example": 2
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Successful response",
                         "content": {
                             "application\/json": {
                                 "schema": {
-                                    "$ref": "#\/components\/schemas\/YourResourceType"
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "title": {
+                                                "type": "string",
+                                                "example": "Ut voluptatem cum."
+                                            },
+                                            "author": {
+                                                "type": "string",
+                                                "example": "Adella Kozey"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Ut et optio quo. Velit minus et dolores tempora nemo."
+                                            },
+                                            "price": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 22.12
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Content not found",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error_code": {
+                                            "type": "integer",
+                                            "example": 1404
+                                        },
+                                        "error_message": {
+                                            "type": "string",
+                                            "example": "Content not found"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -44,70 +93,375 @@
                 }
             },
             "post": {
-                "responses": {
-                    "default": {
-                        "description": ""
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Create a book",
+                "requestBody": {
+                    "description": "Request body",
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Book title",
+                                        "type": "string"
+                                    },
+                                    "author_name": {
+                                        "description": "Book's author name",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Book's desctiption",
+                                        "type": "string",
+                                        "example": null,
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "description": "Book's price",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 69.76
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
                     }
-                }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful response",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 1001
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Created"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error_code": {
+                                            "type": "integer",
+                                            "example": 1406
+                                        },
+                                        "error_message": {
+                                            "type": "string",
+                                            "example": "The field 'param' is missing"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basicAuth": []
+                    }
+                ]
             }
         },
         "\/api\/books\/{id}": {
             "get": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Get a book by specify id",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "Book ID",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
                 "responses": {
-                    "default": {
-                        "description": ""
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 12
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "example": "Reprehenderit nihil aut consequatur nihil."
+                                        },
+                                        "author": {
+                                            "type": "string",
+                                            "example": "Tre Kiehn"
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "example": "Corporis ut voluptatem ab omnis aliquam. Qui natus hic eaque fuga ut. Doloremque error quibusdam tenetur at magni repellat."
+                                        },
+                                        "price": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 69.76
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Content not found",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error_code": {
+                                            "type": "integer",
+                                            "example": 1404
+                                        },
+                                        "error_message": {
+                                            "type": "string",
+                                            "example": "Content not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             },
             "put": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Update an existing book",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "Book ID",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
-                "responses": {
-                    "default": {
-                        "description": ""
+                "requestBody": {
+                    "description": "Request body",
+                    "required": true,
+                    "content": {
+                        "application\/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Book title",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "author_name": {
+                                        "description": "Book's author name",
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "description": "Book's desctiption",
+                                        "type": "string",
+                                        "example": null,
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "description": "Book's price",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 69.76,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
                     }
-                }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 1000
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1000015
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "This is best title"
+                                                },
+                                                "author": {
+                                                    "type": "string",
+                                                    "example": "van Tester"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Qui natus hic eaque fuga ut."
+                                                },
+                                                "price": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 12.7
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Content not found",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error_code": {
+                                            "type": "integer",
+                                            "example": 1404
+                                        },
+                                        "error_message": {
+                                            "type": "string",
+                                            "example": "Content not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "406": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error_code": {
+                                            "type": "integer",
+                                            "example": 1406
+                                        },
+                                        "error_message": {
+                                            "type": "string",
+                                            "example": "The field 'param' is missing"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "basicAuth": []
+                    }
+                ]
             },
             "delete": {
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Get a books",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
+                        "description": "Book ID",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     }
                 ],
                 "responses": {
-                    "default": {
-                        "description": ""
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 1000
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Content not found",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error_code": {
+                                            "type": "integer",
+                                            "example": 1404
+                                        },
+                                        "error_message": {
+                                            "type": "string",
+                                            "example": "Content not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "basicAuth": []
+                    }
+                ]
             }
-        }
-    },
-    "components": {
-        "schemas": {
-            "YourResourceType": {}
         }
     }
 }
