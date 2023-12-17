@@ -36,9 +36,7 @@ class BookController extends AbstractFOSRestController
      *         description="Page number for pagination",
      *         required=false,
      *         example=2,
-     *         @OA\Schema(
-     *             type="integer",
-     *         )
+     *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -79,13 +77,25 @@ class BookController extends AbstractFOSRestController
     /**
      * @OA\Get(
      *     path="/api/books/{id}",
-     *     summary="Get a books",
+     *     summary="Get a book by specify id",
      *     tags={"Books"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Book ID",
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
      *         @OA\JsonContent(
-     *             ref=@Model(type=YourResourceType::class)
+     *             type="object",
+     *             @OA\Property(property="id",type="integer",example=12),
+     *             @OA\Property(property="title",type="string",example="Reprehenderit nihil aut consequatur nihil."),
+     *             @OA\Property(property="author",type="string",example="Tre Kiehn"),
+     *             @OA\Property(property="description",type="string",example="Corporis ut voluptatem ab omnis aliquam. Qui natus hic eaque fuga ut. Doloremque error quibusdam tenetur at magni repellat."),
+     *             @OA\Property(property="price",type="number",format="float",example=69.76)
      *         )
      *     )
      * )
@@ -116,13 +126,26 @@ class BookController extends AbstractFOSRestController
     /**
      * @OA\Post(
      *     path="/api/books",
-     *     summary="Get a books",
+     *     summary="Create a book",
      *     tags={"Books"},
+     *     security={{"basicAuth": {}}},
+     *     @OA\RequestBody(
+     *         description="Request body",
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string", description="Book title"),
+     *             @OA\Property(property="author_name", type="string", description="Book's author name"),
+     *             @OA\Property(property="description", type="string", description="Book's desctiption", nullable=true, example=null),
+     *             @OA\Property(property="price", type="number",format="float", description="Book's price", example=69.76),
+     *         )
+     *     ),
      *     @OA\Response(
-     *         response=200,
+     *         response=201,
      *         description="Successful response",
      *         @OA\JsonContent(
-     *             ref=@Model(type=YourResourceType::class)
+     *             type="object",
+     *             @OA\Property(property="code",type="integer",example=1001),
+     *             @OA\Property(property="message",type="string",example="Created")
      *         )
      *     )
      * )
