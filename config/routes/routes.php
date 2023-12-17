@@ -29,5 +29,9 @@ return function (RoutingConfigurator $routes) {
     $routes->add('delete_book', '/api/books/{id}')
         ->methods(['DELETE'])
         ->controller([BookController::class, 'deleteBook']);
+
+    $routes->add('get_books', '/api/books/catalog')
+        ->methods(['POST'])
+        ->controller([BookController::class, 'generateBookCatalog']);
 };
 

@@ -38,6 +38,14 @@ class BookController extends AbstractFOSRestController
      *         example=2,
      *         @OA\Schema(type="integer")
      *     ),
+     *     @OA\Parameter(
+     *         name="author",
+     *         in="query",
+     *         description="Filter by author name",
+     *         required=false,
+     *         example=2,
+     *         @OA\Schema(type="string")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
@@ -517,6 +525,78 @@ class BookController extends AbstractFOSRestController
             $this->view(ReponseController::generateSuccessResponse(ResponseCode::SUCCESS),
                 Response::HTTP_OK)
         );
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/books/catalog",
+     *     summary="Get a catalog book file",
+     *     tags={"Catalog"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="code", type="integer", example=1000),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     example="http://192.168.0.7:8000/catalog/books_catalog.csv"
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function generateBookCatalog(Request $request): Response
+    {
+        $fastCloseConnection = true;
+        $bookRepository = $this->entityManager->getRepository(Book::class);
+
+        $page = 0;
+
+        $file = 'catalog/books_catalog_' . date('YmdHis') . '.csv';
+
+        $handle = fopen($this->getParameter('kernel.project_dir').'/public/' . $file, 'w+');
+
+        $scheme = $request->getScheme();
+        $host = $request->getHost();
+        $port = $request->getPort();
+
+        $response = [
+            'file' => $scheme . '://' . $host . ':' . $port . '/' . $file
+        ];
+
+        if ($fastCloseConnection)
+        {
+            echo json_encode(ReponseController::generateSuccessResponseWithData(ResponseCode::SUCCESS, $response));
+            fastcgi_finish_request();
+        }
+
+        while (true)
+        {
+            if (!$books = $bookRepository->getBooks($page, 20000))
+            {
+                fclose($handle);
+
+                return $this->handleView(
+                    $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::CREATED, $response),
+                        Response::HTTP_CREATED)
+                );
+            }
+
+            foreach ($books as $book) {
+                $csvLine = sprintf('"%s";"%s";', $book['title'], $book['price']) . PHP_EOL;
+
+                fwrite($handle, $csvLine);
+            }
+            
+            $page++;
+        }
     }
 
     /**
