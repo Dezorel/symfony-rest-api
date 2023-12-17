@@ -20,13 +20,11 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    App\Controller\api\v1\BookController:
+    App\Controller\Api\v1\BookController:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
 
-    App\Controller\api\Documentation\SwaggerController:
-        arguments:
-            $entityManager: '@doctrine.orm.entity_manager'
+    App\Controller\Api\Documentation\SwaggerController:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

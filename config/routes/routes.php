@@ -1,8 +1,8 @@
 <?php
 
-use App\Controller\Api\Documentation\SwaggerController;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use App\Controller\api\v1\BookController;
+use App\Controller\Api\v1\BookController;
+use App\Controller\Api\Documentation\SwaggerController;
 
 return function (RoutingConfigurator $routes) {
 

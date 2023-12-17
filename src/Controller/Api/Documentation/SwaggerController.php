@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SwaggerController extends AbstractController
 {
-    public function apiDocumentation()
+    public function apiDocumentation(): Response
     {
         // Assuming 'config/dump/swagger.json' is the path to your Swagger JSON
         $jsonUrl = $this->getParameter('kernel.project_dir').'/public/swagger.json';
