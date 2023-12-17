@@ -162,8 +162,13 @@ class BookController extends AbstractFOSRestController
      *         description="Successful response",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="code",type="integer",example=1001),
-     *             @OA\Property(property="message",type="string",example="Created")
+     *             @OA\Property(property="code", type="integer", example=1001),
+     *             @OA\Property(property="message", type="string", example="Created"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1000018)
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -248,7 +253,7 @@ class BookController extends AbstractFOSRestController
         $this->entityManager->flush();
 
         return $this->handleView(
-            $this->view(ReponseController::generateSuccessResponse(ResponseCode::CREATED),
+            $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::CREATED, ['id' => $book->getId()]),
             Response::HTTP_CREATED)
         );
     }
