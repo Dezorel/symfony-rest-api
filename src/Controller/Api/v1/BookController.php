@@ -8,8 +8,6 @@ use App\Enums\ResponseCode;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use Symfony\Component\Routing\Annotation\Route;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -30,13 +28,31 @@ class BookController extends AbstractFOSRestController
     /**
      * @OA\Get(
      *     path="/api/books",
-     *     summary="Get a books",
+     *     summary="Get a list of books",
      *     tags={"Books"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number for pagination",
+     *         required=false,
+     *         example=2,
+     *         @OA\Schema(
+     *             type="integer",
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
      *         @OA\JsonContent(
-     *             ref=@Model(type=YourResourceType::class)
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id",type="integer",example=1),
+     *                 @OA\Property(property="title",type="string",example="Ut voluptatem cum."),
+     *                 @OA\Property(property="author",type="string", example="Adella Kozey"),
+     *                 @OA\Property(property="description",type="string",example="Ut et optio quo. Velit minus et dolores tempora nemo."),
+     *                 @OA\Property(property="price",type="number",format="float",example=22.12)
+     *             )
      *         )
      *     )
      * )
@@ -60,6 +76,20 @@ class BookController extends AbstractFOSRestController
         return $this->handleView($this->view($books, Response::HTTP_OK));
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/books/{id}",
+     *     summary="Get a books",
+     *     tags={"Books"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             ref=@Model(type=YourResourceType::class)
+     *         )
+     *     )
+     * )
+     */
     public function getBookById(int $id): Response
     {
         $bookRepository = $this->entityManager->getRepository(Book::class);
@@ -83,6 +113,20 @@ class BookController extends AbstractFOSRestController
         return $this->handleView($this->view($responseData, Response::HTTP_OK));
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/books",
+     *     summary="Get a books",
+     *     tags={"Books"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             ref=@Model(type=YourResourceType::class)
+     *         )
+     *     )
+     * )
+     */
     public function createBook(Request $request, ValidatorInterface $validator): Response
     {
         $authorRepository = $this->entityManager->getRepository(Author::class);
@@ -152,6 +196,20 @@ class BookController extends AbstractFOSRestController
     }
 
 
+    /**
+     * @OA\Put(
+     *     path="/api/books/{id}",
+     *     summary="Get a books",
+     *     tags={"Books"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             ref=@Model(type=YourResourceType::class)
+     *         )
+     *     )
+     * )
+     */
     public function updateBook(Request $request, ValidatorInterface $validator, int $id): Response
     {
         $availableToCreateAuthor = true;
@@ -279,6 +337,21 @@ class BookController extends AbstractFOSRestController
         );
     }
 
+
+    /**
+     * @OA\Delete(
+     *     path="/api/books/{id}",
+     *     summary="Get a books",
+     *     tags={"Books"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             ref=@Model(type=YourResourceType::class)
+     *         )
+     *     )
+     * )
+     */
     public function deleteBook(int $id): Response
     {
         $bookRepository = $this->entityManager->getRepository(Book::class);
