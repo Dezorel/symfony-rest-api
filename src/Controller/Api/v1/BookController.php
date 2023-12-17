@@ -395,11 +395,21 @@ class BookController extends AbstractFOSRestController
      *     path="/api/books/{id}",
      *     summary="Get a books",
      *     tags={"Books"},
+     *     security={{"basicAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Book ID",
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
      *         @OA\JsonContent(
-     *             ref=@Model(type=YourResourceType::class)
+     *             type="object",
+     *             @OA\Property(property="code",type="integer",example=1000),
+     *             @OA\Property(property="message",type="string",example="Success")
      *         )
      *     )
      * )
