@@ -222,13 +222,42 @@ class BookController extends AbstractFOSRestController
     /**
      * @OA\Put(
      *     path="/api/books/{id}",
-     *     summary="Get a books",
+     *     summary="Update an existing book",
      *     tags={"Books"},
+     *     security={{"basicAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Book ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         description="Request body",
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string", description="Book title", nullable=true),
+     *             @OA\Property(property="author_name", type="string", description="Book's author name", nullable=true),
+     *             @OA\Property(property="description", type="string", description="Book's desctiption", nullable=true, example=null),
+     *             @OA\Property(property="price", type="number",format="float", description="Book's price", nullable=true, example=69.76),
+     *         )
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Successful response",
      *         @OA\JsonContent(
-     *             ref=@Model(type=YourResourceType::class)
+     *             type="object",
+     *             @OA\Property(property="code",type="integer",example=1000),
+     *             @OA\Property(property="message",type="string",example="Success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id",type="integer",example=1000015),
+     *                 @OA\Property(property="title",type="string",example="This is best title"),
+     *                 @OA\Property(property="author",type="string",example="van Tester"),
+     *                 @OA\Property(property="description",type="string",example="Qui natus hic eaque fuga ut."),
+     *                 @OA\Property(property="price",type="number",format="float",example=12.7)
+     *             )
      *         )
      *     )
      * )
