@@ -528,7 +528,7 @@ class BookController extends AbstractFOSRestController
     }
 
     /**
-     * @OA\Get(
+     * @OA\Post(
      *     path="/api/books/catalog",
      *     summary="Get a catalog book file",
      *     tags={"Catalog"},
