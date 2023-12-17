@@ -52,6 +52,15 @@ class BookController extends AbstractFOSRestController
      *                 @OA\Property(property="price",type="number",format="float",example=22.12)
      *             )
      *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Content not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1404),
+     *             @OA\Property(property="error_message",type="string",example="Content not found")
+     *         )
      *     )
      * )
      */
@@ -96,6 +105,15 @@ class BookController extends AbstractFOSRestController
      *             @OA\Property(property="author",type="string",example="Tre Kiehn"),
      *             @OA\Property(property="description",type="string",example="Corporis ut voluptatem ab omnis aliquam. Qui natus hic eaque fuga ut. Doloremque error quibusdam tenetur at magni repellat."),
      *             @OA\Property(property="price",type="number",format="float",example=69.76)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Content not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1404),
+     *             @OA\Property(property="error_message",type="string",example="Content not found")
      *         )
      *     )
      * )
@@ -147,7 +165,16 @@ class BookController extends AbstractFOSRestController
      *             @OA\Property(property="code",type="integer",example=1001),
      *             @OA\Property(property="message",type="string",example="Created")
      *         )
-     *     )
+     *     ),
+     *     @OA\Response(
+     *         response=406,
+     *         description="Validation failed",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1406),
+     *             @OA\Property(property="error_message",type="string",example="The field 'param' is missing")
+     *         )
+     *     ),
      * )
      */
     public function createBook(Request $request, ValidatorInterface $validator): Response
@@ -259,7 +286,25 @@ class BookController extends AbstractFOSRestController
      *                 @OA\Property(property="price",type="number",format="float",example=12.7)
      *             )
      *         )
-     *     )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Content not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1404),
+     *             @OA\Property(property="error_message",type="string",example="Content not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=406,
+     *         description="Validation failed",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1406),
+     *             @OA\Property(property="error_message",type="string",example="The field 'param' is missing")
+     *         )
+     *     ),
      * )
      */
     public function updateBook(Request $request, ValidatorInterface $validator, int $id): Response
@@ -389,7 +434,6 @@ class BookController extends AbstractFOSRestController
         );
     }
 
-
     /**
      * @OA\Delete(
      *     path="/api/books/{id}",
@@ -410,6 +454,15 @@ class BookController extends AbstractFOSRestController
      *             type="object",
      *             @OA\Property(property="code",type="integer",example=1000),
      *             @OA\Property(property="message",type="string",example="Success")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Content not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1404),
+     *             @OA\Property(property="error_message",type="string",example="Content not found")
      *         )
      *     )
      * )
