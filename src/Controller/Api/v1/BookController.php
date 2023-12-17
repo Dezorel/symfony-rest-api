@@ -8,6 +8,7 @@ use App\Enums\ResponseCode;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
+use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +28,6 @@ class BookController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Get("/api/books")
-     *
      * @OA\Get(
      *     path="/api/books",
      *     summary="Get a books",
@@ -61,9 +60,6 @@ class BookController extends AbstractFOSRestController
         return $this->handleView($this->view($books, Response::HTTP_OK));
     }
 
-    /**
-     * @Rest\Get("/api/books/{id}")
-     */
     public function getBookById(int $id): Response
     {
         $bookRepository = $this->entityManager->getRepository(Book::class);
@@ -87,9 +83,6 @@ class BookController extends AbstractFOSRestController
         return $this->handleView($this->view($responseData, Response::HTTP_OK));
     }
 
-    /**
-     * @Rest\Post("/api/books")
-     */
     public function createBook(Request $request, ValidatorInterface $validator): Response
     {
         $authorRepository = $this->entityManager->getRepository(Author::class);
@@ -158,9 +151,7 @@ class BookController extends AbstractFOSRestController
         );
     }
 
-    /**
-     * @Rest\Put("/api/books/{id}")
-     */
+
     public function updateBook(Request $request, ValidatorInterface $validator, int $id): Response
     {
         $availableToCreateAuthor = true;
@@ -288,9 +279,6 @@ class BookController extends AbstractFOSRestController
         );
     }
 
-    /**
-     * @Rest\Delete("/api/books/{id}")
-     */
     public function deleteBook(int $id): Response
     {
         $bookRepository = $this->entityManager->getRepository(Book::class);
