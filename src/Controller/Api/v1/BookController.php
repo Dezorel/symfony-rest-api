@@ -183,6 +183,14 @@ class BookController extends AbstractFOSRestController
 
         $jsonData = json_decode($request->getContent(), true);
 
+        if (!$jsonData)
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::MISSING_PARAMS),
+                    Response::HTTP_NOT_ACCEPTABLE)
+            );
+        }
+
         try
         {
             UtilityController::validateParam($validator, $jsonData, $this->getBookConstraint());
@@ -244,7 +252,6 @@ class BookController extends AbstractFOSRestController
             Response::HTTP_CREATED)
         );
     }
-
 
     /**
      * @OA\Put(
@@ -316,6 +323,14 @@ class BookController extends AbstractFOSRestController
         $authorRepository = $this->entityManager->getRepository(Author::class);
 
         $jsonData = json_decode($request->getContent(), true);
+
+        if (!$jsonData)
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::MISSING_PARAMS),
+                    Response::HTTP_NOT_ACCEPTABLE)
+            );
+        }
 
         if (!$book = $bookRepository->getBookById($id))
         {
