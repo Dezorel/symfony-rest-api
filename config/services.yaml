@@ -24,7 +24,7 @@ services:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
 
-    App\Controller\Api\Documentation\SwaggerController:
+    App\Controller\api\Documentation\SwaggerController:
         arguments:
             $entityManager: '@doctrine.orm.entity_manager'
 
