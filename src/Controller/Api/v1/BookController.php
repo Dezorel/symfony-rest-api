@@ -573,6 +573,7 @@ class BookController extends AbstractFOSRestController
 
         if ($fastCloseConnection)
         {
+            header('Content-Type: application/json; charset=utf-8');
             echo json_encode(ReponseController::generateSuccessResponseWithData(ResponseCode::SUCCESS, $response));
             fastcgi_finish_request();
         }
