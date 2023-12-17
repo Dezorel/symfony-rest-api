@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api\Documantation;
+namespace App\Controller\Api\Documentation;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SwaggerController extends AbstractController
 {
-    /**
-     * @Route("/api/doc", name="api_doc", methods={"GET"})
-     */
     public function apiDocumentation()
     {
         // Assuming 'config/dump/swagger.json' is the path to your Swagger JSON
