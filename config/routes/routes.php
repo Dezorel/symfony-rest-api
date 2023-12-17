@@ -18,6 +18,10 @@ return function (RoutingConfigurator $routes) {
         ->methods(['POST'])
         ->controller([BookController::class, 'createBook']);
 
+    $routes->add('get_books_catalog', '/api/books/catalog')
+        ->methods(['GET'])
+        ->controller([BookController::class, 'generateBookCatalog']);
+
     $routes->add('get_book_by_id', '/api/books/{id}')
         ->methods(['GET'])
         ->controller([BookController::class, 'getBookById']);
@@ -29,9 +33,5 @@ return function (RoutingConfigurator $routes) {
     $routes->add('delete_book', '/api/books/{id}')
         ->methods(['DELETE'])
         ->controller([BookController::class, 'deleteBook']);
-
-    $routes->add('get_books', '/api/books/catalog')
-        ->methods(['POST'])
-        ->controller([BookController::class, 'generateBookCatalog']);
 };
 
