@@ -31,6 +31,16 @@
                             "type": "integer"
                         },
                         "example": 2
+                    },
+                    {
+                        "name": "author",
+                        "in": "query",
+                        "description": "Filter by author name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": 2
                     }
                 ],
                 "responses": {
@@ -144,6 +154,15 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Created"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1000018
+                                                }
+                                            },
+                                            "type": "object"
                                         }
                                     },
                                     "type": "object"
@@ -177,6 +196,45 @@
                         "basicAuth": []
                     }
                 ]
+            }
+        },
+        "\/api\/books\/catalog": {
+            "post": {
+                "tags": [
+                    "Catalog"
+                ],
+                "summary": "Get a catalog book file",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application\/json": {
+                                "schema": {
+                                    "properties": {
+                                        "code": {
+                                            "type": "integer",
+                                            "example": 1000
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "file": {
+                                                    "type": "string",
+                                                    "example": "http:\/\/192.168.0.7:8000\/catalog\/books_catalog.csv"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "\/api\/books\/{id}": {
