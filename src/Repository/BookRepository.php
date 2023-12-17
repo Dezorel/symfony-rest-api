@@ -46,6 +46,26 @@ class BookRepository extends EntityRepository
     }
 
     /**
+     * @param int $page
+     * @param int $elementsPerPage
+     * @return float|int|mixed|string
+     */
+    public function getBookByAuthorName(string $authorName, int $page = 0, int $elementsPerPage = 10): mixed
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+
+        $queryBuilder->select('b.id', 'b.title', 'a.name as author', 'b.description', 'b.price')
+            ->from($this->getClassName(), 'b')
+            ->leftJoin('b.author', 'a')
+            ->where('a.name = :author')
+            ->setParameter('author', $authorName)
+            ->setFirstResult($elementsPerPage * $page)
+            ->setMaxResults($elementsPerPage);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
      * @param int $id
      * @return float|int|mixed|string
      */

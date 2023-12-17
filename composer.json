@@ -11,15 +11,20 @@
         "doctrine/orm": "^2.17",
         "friendsofsymfony/rest-bundle": "^3.6",
         "jms/serializer-bundle": "^5.3",
+        "nelmio/api-doc-bundle": "^4.12",
         "sensio/framework-extra-bundle": "^6.2",
+        "swagger-api/swagger-ui": "^5.10",
         "symfony/console": "6.0.*",
         "symfony/dotenv": "6.0.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.0.*",
         "symfony/runtime": "6.0.*",
         "symfony/security-bundle": "6.0.*",
+        "symfony/twig-bundle": "6.0.*",
         "symfony/validator": "6.0.*",
-        "symfony/yaml": "6.0.*"
+        "symfony/yaml": "6.0.*",
+        "twig/twig": "*",
+        "zircote/swagger-php": "^4.8"
     },
     "config": {
         "allow-plugins": {

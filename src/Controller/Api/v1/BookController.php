@@ -8,11 +8,13 @@ use App\Enums\ResponseCode;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 
 class BookController extends AbstractFOSRestController
 {
@@ -24,29 +26,119 @@ class BookController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Get("/api/books")
+     * @OA\Get(
+     *     path="/api/books",
+     *     summary="Get a list of books",
+     *     tags={"Books"},
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         description="Page number for pagination",
+     *         required=false,
+     *         example=2,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Parameter(
+     *         name="author",
+     *         in="query",
+     *         description="Filter by author name",
+     *         required=false,
+     *         example=2,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id",type="integer",example=1),
+     *                 @OA\Property(property="title",type="string",example="Ut voluptatem cum."),
+     *                 @OA\Property(property="author",type="string", example="Adella Kozey"),
+     *                 @OA\Property(property="description",type="string",example="Ut et optio quo. Velit minus et dolores tempora nemo."),
+     *                 @OA\Property(property="price",type="number",format="float",example=22.12)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Content not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1404),
+     *             @OA\Property(property="error_message",type="string",example="Content not found")
+     *         )
+     *     )
+     * )
      */
     public function getBooks(Request $request): Response
     {
         $bookRepository = $this->entityManager->getRepository(Book::class);
 
         $page = $request->query->get('page', '0');
+        $authorName = $request->query->get('author', '0');
 
         $page = $page ? $page - 1 : 0;
 
-        if (!$books = $bookRepository->getBooks($page))
+        if (!$authorName)
         {
-            return $this->handleView(
-                $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
-                    Response::HTTP_NOT_FOUND)
-            );
+            if (!$books = $bookRepository->getBooks( $page))
+            {
+                return $this->handleView(
+                    $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                        Response::HTTP_NOT_FOUND)
+                );
+            }
+        }
+        else
+        {
+            if (!$books = $bookRepository->getBookByAuthorName($authorName, $page))
+            {
+                return $this->handleView(
+                    $this->view(ReponseController::generateFailedResponse(ResponseCode::NOT_FOUND),
+                        Response::HTTP_NOT_FOUND)
+                );
+            }
         }
 
         return $this->handleView($this->view($books, Response::HTTP_OK));
     }
 
     /**
-     * @Rest\Get("/api/books/{id}")
+     * @OA\Get(
+     *     path="/api/books/{id}",
+     *     summary="Get a book by specify id",
+     *     tags={"Books"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Book ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id",type="integer",example=12),
+     *             @OA\Property(property="title",type="string",example="Reprehenderit nihil aut consequatur nihil."),
+     *             @OA\Property(property="author",type="string",example="Tre Kiehn"),
+     *             @OA\Property(property="description",type="string",example="Corporis ut voluptatem ab omnis aliquam. Qui natus hic eaque fuga ut. Doloremque error quibusdam tenetur at magni repellat."),
+     *             @OA\Property(property="price",type="number",format="float",example=69.76)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Content not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1404),
+     *             @OA\Property(property="error_message",type="string",example="Content not found")
+     *         )
+     *     )
+     * )
      */
     public function getBookById(int $id): Response
     {
@@ -72,13 +164,59 @@ class BookController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Post("/api/books")
+     * @OA\Post(
+     *     path="/api/books",
+     *     summary="Create a book",
+     *     tags={"Books"},
+     *     security={{"basicAuth": {}}},
+     *     @OA\RequestBody(
+     *         description="Request body",
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string", description="Book title"),
+     *             @OA\Property(property="author_name", type="string", description="Book's author name"),
+     *             @OA\Property(property="description", type="string", description="Book's desctiption", nullable=true, example=null),
+     *             @OA\Property(property="price", type="number",format="float", description="Book's price", example=69.76),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="code", type="integer", example=1001),
+     *             @OA\Property(property="message", type="string", example="Created"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=1000018)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=406,
+     *         description="Validation failed",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1406),
+     *             @OA\Property(property="error_message",type="string",example="The field 'param' is missing")
+     *         )
+     *     ),
+     * )
      */
     public function createBook(Request $request, ValidatorInterface $validator): Response
     {
         $authorRepository = $this->entityManager->getRepository(Author::class);
 
         $jsonData = json_decode($request->getContent(), true);
+
+        if (!$jsonData)
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::MISSING_PARAMS),
+                    Response::HTTP_NOT_ACCEPTABLE)
+            );
+        }
 
         try
         {
@@ -137,13 +275,71 @@ class BookController extends AbstractFOSRestController
         $this->entityManager->flush();
 
         return $this->handleView(
-            $this->view(ReponseController::generateSuccessResponse(ResponseCode::CREATED),
+            $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::CREATED, ['id' => $book->getId()]),
             Response::HTTP_CREATED)
         );
     }
 
     /**
-     * @Rest\Put("/api/books/{id}")
+     * @OA\Put(
+     *     path="/api/books/{id}",
+     *     summary="Update an existing book",
+     *     tags={"Books"},
+     *     security={{"basicAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Book ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         description="Request body",
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="title", type="string", description="Book title", nullable=true),
+     *             @OA\Property(property="author_name", type="string", description="Book's author name", nullable=true),
+     *             @OA\Property(property="description", type="string", description="Book's desctiption", nullable=true, example=null),
+     *             @OA\Property(property="price", type="number",format="float", description="Book's price", nullable=true, example=69.76),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="code",type="integer",example=1000),
+     *             @OA\Property(property="message",type="string",example="Success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(property="id",type="integer",example=1000015),
+     *                 @OA\Property(property="title",type="string",example="This is best title"),
+     *                 @OA\Property(property="author",type="string",example="van Tester"),
+     *                 @OA\Property(property="description",type="string",example="Qui natus hic eaque fuga ut."),
+     *                 @OA\Property(property="price",type="number",format="float",example=12.7)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Content not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1404),
+     *             @OA\Property(property="error_message",type="string",example="Content not found")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=406,
+     *         description="Validation failed",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1406),
+     *             @OA\Property(property="error_message",type="string",example="The field 'param' is missing")
+     *         )
+     *     ),
+     * )
      */
     public function updateBook(Request $request, ValidatorInterface $validator, int $id): Response
     {
@@ -154,6 +350,14 @@ class BookController extends AbstractFOSRestController
         $authorRepository = $this->entityManager->getRepository(Author::class);
 
         $jsonData = json_decode($request->getContent(), true);
+
+        if (!$jsonData)
+        {
+            return $this->handleView(
+                $this->view(ReponseController::generateFailedResponse(ResponseCode::MISSING_PARAMS),
+                    Response::HTTP_NOT_ACCEPTABLE)
+            );
+        }
 
         if (!$book = $bookRepository->getBookById($id))
         {
@@ -273,7 +477,37 @@ class BookController extends AbstractFOSRestController
     }
 
     /**
-     * @Rest\Delete("/api/books/{id}")
+     * @OA\Delete(
+     *     path="/api/books/{id}",
+     *     summary="Get a books",
+     *     tags={"Books"},
+     *     security={{"basicAuth": {}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Book ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="code",type="integer",example=1000),
+     *             @OA\Property(property="message",type="string",example="Success")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Content not found",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="error_code",type="integer",example=1404),
+     *             @OA\Property(property="error_message",type="string",example="Content not found")
+     *         )
+     *     )
+     * )
      */
     public function deleteBook(int $id): Response
     {
@@ -291,6 +525,79 @@ class BookController extends AbstractFOSRestController
             $this->view(ReponseController::generateSuccessResponse(ResponseCode::SUCCESS),
                 Response::HTTP_OK)
         );
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/books/catalog",
+     *     summary="Get a catalog book file",
+     *     tags={"Catalog"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="code", type="integer", example=1000),
+     *             @OA\Property(property="message", type="string", example="Success"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="file",
+     *                     type="string",
+     *                     example="http://192.168.0.7:8000/catalog/books_catalog.csv"
+     *                 )
+     *             )
+     *         )
+     *     )
+     * )
+     */
+    public function generateBookCatalog(Request $request): Response
+    {
+        $fastCloseConnection = true;
+        $bookRepository = $this->entityManager->getRepository(Book::class);
+
+        $page = 0;
+
+        $file = 'catalog/books_catalog_' . date('YmdHis') . '.csv';
+
+        $handle = fopen($this->getParameter('kernel.project_dir').'/public/' . $file, 'w+');
+
+        $scheme = $request->getScheme();
+        $host = $request->getHost();
+        $port = $request->getPort();
+
+        $response = [
+            'file' => $scheme . '://' . $host . ':' . $port . '/' . $file
+        ];
+
+        if ($fastCloseConnection)
+        {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(ReponseController::generateSuccessResponseWithData(ResponseCode::SUCCESS, $response));
+            fastcgi_finish_request();
+        }
+
+        while (true)
+        {
+            if (!$books = $bookRepository->getBooks($page, 20000))
+            {
+                fclose($handle);
+
+                return $this->handleView(
+                    $this->view(ReponseController::generateSuccessResponseWithData(ResponseCode::CREATED, $response),
+                        Response::HTTP_CREATED)
+                );
+            }
+
+            foreach ($books as $book) {
+                $csvLine = sprintf('"%s";"%s";', $book['title'], $book['price']) . PHP_EOL;
+
+                fwrite($handle, $csvLine);
+            }
+            
+            $page++;
+        }
     }
 
     /**

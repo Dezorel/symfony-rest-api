@@ -1,0 +1,35 @@
+{# templates/swagger_ui/index.html.twig #}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.x/swagger-ui.css">
+</head>
+<body>
+<div id="swagger-ui"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.x/swagger-ui-bundle.js"> </script>
+<script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.x/swagger-ui-standalone-preset.js"> </script>
+<script>
+    window.onload = function() {
+        // Begin Swagger UI call region
+        const ui = SwaggerUIBundle({
+            url: "http://192.168.0.7:8000/swagger.json", // Use the URL passed from the controller
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout"
+        })
+        // End Swagger UI call region
+    }
+</script>
+</body>
+</html>

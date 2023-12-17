@@ -17,9 +17,6 @@ class AuthorController extends AbstractFOSRestController
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * @Rest\Get("/api/v1/test")
-     */
     public function test(): Response
     {
         $authorRepository = $this->entityManager->getRepository(Author::class);
